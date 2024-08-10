@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import jwt from "JsonWebTokenError";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
@@ -16,7 +16,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
+      lowecase: true,
       trim: true,
     },
     fullName: {
@@ -26,11 +26,11 @@ const userSchema = new Schema(
       index: true,
     },
     avatar: {
-      type: String,
-      required: true, //cloudanary url
+      type: String, // cloudinary url
+      required: true,
     },
     coverImage: {
-      type: String, //cloudanary url
+      type: String, // cloudinary url
     },
     watchHistory: [
       {
@@ -40,24 +40,29 @@ const userSchema = new Schema(
     ],
     password: {
       type: String,
-      required: [true, "password is required"],
+      required: [true, "Password is required"],
     },
     refreshToken: {
-      type: string,
+      type: String,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
-userSchema.pre("save ", async function (next) {
-  if (this.isModified("password")) return next();
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
 
   this.password = await bcrypt.hash(this.password, 10);
-  return next();
+  next();
 });
-userSchema.method.isPasswordCorrect = async function (password) {
+
+userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-userSchema.method.generateAccessToken = function () {
+
+userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
@@ -71,7 +76,7 @@ userSchema.method.generateAccessToken = function () {
     }
   );
 };
-userSchema.method.generateRefreshToken = function () {
+userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
       _id: this._id,
@@ -82,4 +87,5 @@ userSchema.method.generateRefreshToken = function () {
     }
   );
 };
+
 export const User = mongoose.model("User", userSchema);
