@@ -246,4 +246,13 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, user, "Account details Updated Sucessfully"));
 });
 
-export { registerUser };
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  generateAccessAndRefreshToken,
+  changeCurrentPassword,
+  getCurrentUser,
+  updateAccountDetails,
+};
